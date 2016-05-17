@@ -23,30 +23,66 @@ router.get('/api/days/:id', function(req,res,next){
 			Hotel,
 			{association:Day.restaurantAssociation},
 			{association:Day.activityAssociation}
-			// model: Restaurant,
-			// model: Activity
-		]
-		
+		]	
 	})
 	.then(function(foundDay){
-		console.log("found day ", foundDay)
-		res.send(foundDay)
+		res.json(foundDay)
 	})
 })
 
-router.get('/api/days/:id/hotels', function(req,res,next){
-
+router.post('/api/days/:id/hotel', function(req,res,next){
+	Day.findOrCreate({
+		where: {
+			number: +req.params.id
+		}
+	})
+	.then(function(returnedDay){
+		returnedDay[0].updateAttributes({
+			hotelId: req.body.id
+		})
+	})
+	// .then(function(returnedDay){
+	// 		Day.findOne({
+	// 		where: {
+	// 			number: +req.params.id
+	// 		}
+	// 	})
+	// 	.then(function(updatedDay){
+	// 		console.log("updated day", updatedDay)
+	// 		res.json(updatedDay)
+	// 	})
+	// })
 })
 
-router.get('/api/days/:id/restaurants', function(req,res,next){
-
+router.post('/api/days/:id/restaurant', function(req,res,next){
+	Day.findOrCreate({
+		where: {
+			number: +req.params.id
+		},
+		include: [
+			{association: Day.restaurantAssociation}
+		]
+	})
+	.then(function(returnedDay){
+		returnedDay[0].addRestaurant(req.body.id)
+	})
 })
 
-router.get('/api/days/:id/activities', function(req,res,next){
-
+router.post('/api/days/:id/activity', function(req,res,next){
+	Day.findOrCreate({
+		where: {
+			number: +req.params.id
+		},
+		include: [
+			{association: Day.activityAssociation}
+		]
+	})
+	.then(function(returnedDay){
+		returnedDay[0].addActivity(req.body.id)
+	})
 })
 
-router.delete('/api/days', function(req,res,next){
+router.delete('/api/days/:id', function(req,res,next){
 
 })
 

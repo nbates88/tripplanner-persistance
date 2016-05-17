@@ -47,7 +47,7 @@ app.use(function (err, req, res, next) {
   });
 });
 
- // models.Day.sync({force: true})
+ //models.Day.sync({force: true})
 
 // listen on a port
 var port = 3000;

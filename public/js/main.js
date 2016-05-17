@@ -134,6 +134,7 @@ $(function initializeMap (){
     })     
   })
 
+
   $('.day-buttons').on('click', 'button[data-day]', function(event) {
     // Deselect all buttons
     $('.day-buttons > button').removeClass('current-day')
@@ -171,14 +172,13 @@ $(function initializeMap (){
   $(document.body).on('click', 'button[data-action="addSelectionToTrip"]', function(event) {
     console.log(this, event)
     var dst = $(this.dataset.destinationList)
-
-    console.log($(this.dataset.sourceSelect))
+    var selection = $(this.dataset.sourceSelect)[0].selectedOptions[0].value
+  
+    // Get all selected options (usually just one, but why not support many?)
     
-    Array.from(
-      // Get all selected options (usually just one, but why not support many?)
-      $(this.dataset.sourceSelect)[0].selectedOptions)
+    Array.from($(this.dataset.sourceSelect)[0].selectedOptions)
       .forEach(function(option) {
-
+      
         // Create a new list item with a delete button
         var li = $(`<li class=itinerary-item>
                      ${option.textContent}
@@ -193,6 +193,22 @@ $(function initializeMap (){
         // Draw a marker on the map
         li.marker = drawMarker(option.attraction.place.type,
                                option.attraction.place.location)
+        
+        var placeType = option.attraction.place.type
+        var currentDay = $('.current-day')[0].innerHTML
+   
+         $.ajax({
+            method: 'POST',
+            url: '/api/days/'+ currentDay + "/" + placeType,
+            data: {id: selection},
+            dataType: 'json',
+            success: function(updatedDay){
+              console.log(updatedDay)
+                // var updateItinerary = 
+                //$(dst).append(updatedDay);
+            }
+         })   
+
     });
   });
 
@@ -200,5 +216,15 @@ $(function initializeMap (){
     // jQuery's closest function ascends the DOM tree to find the nearest ancestor matching
     // the selector.
     $(this).closest('li.itinerary-item').remove()
+    console.log($(this).closest('li.itinerary-item'))
+    // var currentDay = $('.current-day')[0].innerHTML
+    // $.ajax({
+    //         method: 'DELETE',
+    //         url: '/api/days/'+ currentDay,
+    //         data: {id: selection},
+    //         success: function(data){
+    //             console.log(data);
+    //         }
+    // })     
   })
 });
